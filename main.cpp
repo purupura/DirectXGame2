@@ -17,6 +17,7 @@
 #include <corecrt_math_defines.h>
 #include <fstream>
 #include <sstream>
+#include "Input.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -1022,6 +1023,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//カーソル
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
+	Input* input = nullptr;
+
+	input = new Input();
+	input->Initialize(w.hInstance,  hwnd);
+
+	delete input;
+
 	//ウィンドウクラスの登録
 	RegisterClass(&wc);
 
@@ -1038,7 +1046,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	HWND hwnd = CreateWindow(
 		wc.lpszClassName,
-		L"CG2",
+		L"GE3",
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
