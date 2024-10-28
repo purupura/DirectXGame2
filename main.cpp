@@ -19,6 +19,7 @@
 #include <sstream>
 #include "Input.h"
 
+#pragma comment(lib, "dinput8.lib")
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -1735,7 +1736,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	input = new Input();
 	input->Initialize(wc.hInstance, hwnd);;
 	//入力の更新
+	input->Update();
+	//if (input->PushKey(DIK_0) && input->TriggerKey(DIK_0) == 0) {
+	//	OutputDebugStringA("Hit 0\n");
 
+	//}
 	//入力解放
 	delete input;
 
