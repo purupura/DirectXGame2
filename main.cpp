@@ -1023,12 +1023,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//カーソル
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
-	Input* input = nullptr;
 
-	input = new Input();
-	input->Initialize(w.hInstance,  hwnd);
 
-	delete input;
+
 
 	//ウィンドウクラスの登録
 	RegisterClass(&wc);
@@ -1732,7 +1729,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
 
+		//ポインタ
+	Input* input = nullptr;
+	//入力の初期化
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);;
+	//入力の更新
 
+	//入力解放
+	delete input;
 
 
 

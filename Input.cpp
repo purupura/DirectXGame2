@@ -2,7 +2,10 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include <cassert>
+#include <wrl.h>
 
+
+using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
@@ -28,5 +31,9 @@ void Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 
 void Input::Update()
 {
+	keyboard->Acquire();
 
+	keyboard->GetDeviceState();
 }
+
+
