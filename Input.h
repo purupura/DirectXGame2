@@ -28,4 +28,5 @@ private://メンバ変数
 	ComPtr<IDirectInput8> directInput;
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
+
 };
