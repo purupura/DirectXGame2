@@ -1055,6 +1055,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		wc.hInstance,
 		nullptr);
 
+	Input* input = nullptr;
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);
+
 	ShowWindow(hwnd, SW_SHOW);
 
 #pragma endregion
@@ -1730,19 +1734,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
 
-		//ポインタ
-	Input* input = nullptr;
-	//入力の初期化
-	input = new Input();
-	input->Initialize(wc.hInstance, hwnd);;
-	//入力の更新
-	input->Update();
-	//if (input->PushKey(DIK_0) && input->TriggerKey(DIK_0) == 0) {
-	//	OutputDebugStringA("Hit 0\n");
-
-	//}
-	//入力解放
-	delete input;
 
 
 
@@ -1754,6 +1745,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DispatchMessage(&msg);
 		}
 		else {
+
+			//入力の更新
+			input->Update();
+			if (input->TriggerKey(DIK_SPACE)) {
+				OutputDebugStringA("Hit 0\n");
+
+			}
+
 			//ゲームの処理
 
 			ImGui_ImplDX12_NewFrame();
@@ -2034,6 +2033,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 
+	//入力解放
+	delete input;
 
 
 	ImGui_ImplDX12_Shutdown();
