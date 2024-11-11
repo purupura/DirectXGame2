@@ -1,4 +1,8 @@
 #pragma once
+#include "WinApp.h"
+#include <d3d12.h>
+
+
 class WinApp
 {
 public://静的メンバ関数
