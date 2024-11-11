@@ -1054,12 +1054,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		wc.hInstance,
 		nullptr);
 
-	//ポインタ
+
 	Input* input = nullptr;
-	//入力の初期化
 	input = new Input();
 	input->Initialize(wc.hInstance, hwnd);;
-	//入力の更新
 
 	ShowWindow(hwnd, SW_SHOW);
 
