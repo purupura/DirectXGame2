@@ -42,3 +42,4 @@ bool Input::TriggerKey(BYTE keyNumber)
 	}
 	return false;
 }
+
