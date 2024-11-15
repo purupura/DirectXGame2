@@ -27,8 +27,7 @@ void WinApp::Initialize()
 {
 	HRESULT hr= CoInitializeEx(0, COINIT_MULTITHREADED);
 
-#pragma region Windouの生成
-	WNDCLASS wc{};
+#pragma region Windowの生成
 
 	//ウィンドウプロシージャ
 	wc.lpfnWndProc = WindowProc;
@@ -42,9 +41,7 @@ void WinApp::Initialize()
 	//ウィンドウクラスの登録
 	RegisterClass(&wc);
 
-	//クライアント領域のサイズ　横　縦
-	const int32_t kClientWidth = 1280;
-	const int32_t kClientHeight = 720;
+
 	//　ウィンドウサイズを表す構造体にクライアント領域を入れる
 	RECT wrc = { 0, 0,kClientWidth,kClientHeight };
 

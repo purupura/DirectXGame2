@@ -3,6 +3,7 @@
 #include <d3d12.h>
 
 
+
 class WinApp
 {
 public://静的メンバ関数
@@ -12,5 +13,19 @@ public://メンバ変数
 	void Initialize();
 	//更新
 	void Update();
+public://定数
+	//クライアント領域のサイズ
+	static const int32_t kClientWidth = 1280;
+	static const int32_t kClientHeight = 720;
+
+	HWND GetHwnd() const { return hwnd; }
+	HINSTANCE GetHInstance() const { return wc.hInstance; }
+private:
+
+	
+
+	WNDCLASS wc{};
+
+	
 };
 
