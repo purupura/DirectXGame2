@@ -13,6 +13,8 @@ public://メンバ変数
 	void Initialize();
 	//更新
 	void Update();
+
+	void Finalize();
 public://定数
 	//クライアント領域のサイズ
 	static const int32_t kClientWidth = 1280;
