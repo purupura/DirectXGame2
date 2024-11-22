@@ -23,7 +23,7 @@ public://定数
 private:
 
 	
-
+	HWND hwnd = nullptr;
 	WNDCLASS wc{};
 
 	
