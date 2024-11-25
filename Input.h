@@ -6,7 +6,7 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include "WinApp.h"
-using namespace Microsoft::WRL;
+
 class Input
 {
 public:
@@ -25,8 +25,8 @@ public://メンバ変数
 	bool TriggerKey(BYTE keyNumber);
 private://メンバ変数
 	//キーボードのデバイス
-	ComPtr<IDirectInputDevice8> keyboard;
-	ComPtr<IDirectInput8> directInput;
+	Comptr<IDirectInputDevice8> keyboard;
+	Comptr<IDirectInput8> directInput;
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
 	WinApp* winApp = nullptr;
