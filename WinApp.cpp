@@ -1,7 +1,6 @@
 #include "WinApp.h"
-#include <cstdint>
 #include "externals/imgui/imgui.h"
-#include <Windows.h>
+
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -32,7 +31,7 @@ void WinApp::Initialize()
 	//ウィンドウプロシージャ
 	wc.lpfnWndProc = WindowProc;
 	//ウィンドウクラス名
-	wc.lpszClassName = L"C62WindowClass";
+	wc.lpszClassName = L"GE3WindowClass";
 	//インスタンスハンドル
 	wc.hInstance = GetModuleHandle(nullptr);
 	//カーソル
@@ -40,6 +39,7 @@ void WinApp::Initialize()
 
 	//ウィンドウクラスの登録
 	RegisterClass(&wc);
+
 
 
 	//　ウィンドウサイズを表す構造体にクライアント領域を入れる

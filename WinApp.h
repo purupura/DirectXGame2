@@ -1,7 +1,6 @@
 #pragma once
-#include "WinApp.h"
-#include <d3d12.h>
-
+#include <cstdint>
+#include <wrl.h>
 
 
 class WinApp
