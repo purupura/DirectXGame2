@@ -1,3 +1,5 @@
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib,"dxguid.lib")
 #include "Input.h"
 #include <cassert>
 
@@ -37,7 +39,7 @@ bool Input::PushKey(BYTE keyNumber)
 bool Input::TriggerKey(BYTE keyNumber)
 {
 	if (keyPre[keyNumber] == 0 && key[keyNumber]) {
-		OutputDebugStringA("Hit 0\n");
+		
 		return true;
 	}
 	return false;
