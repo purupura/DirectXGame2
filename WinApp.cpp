@@ -56,7 +56,7 @@ void WinApp::Initialize()
 
 	hwnd = CreateWindow(
 		wc.lpszClassName,
-		L"CG2",
+		L"GE3",
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -66,9 +66,6 @@ void WinApp::Initialize()
 		nullptr,
 		wc.hInstance,
 		nullptr);
-
-
-
 
 	ShowWindow(hwnd, SW_SHOW);
 }
