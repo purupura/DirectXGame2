@@ -19,7 +19,7 @@
 #include "Input.h"
 #include "WinApp.h"
 
-
+#pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxcompiler.lib")

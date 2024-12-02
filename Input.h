@@ -6,6 +6,7 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include "WinApp.h"
+#include <cassert>
 
 class Input
 {
@@ -30,5 +31,6 @@ private://メンバ変数
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
 	WinApp* winApp = nullptr;
+	HRESULT result;
 
 };

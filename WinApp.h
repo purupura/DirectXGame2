@@ -1,13 +1,15 @@
 #pragma once
-#include "WinApp.h"
-#include <d3d12.h>
+#include <Windows.h>
+#include <cstdint>
+#include <wrl.h>
+#include <WinUser.h>
 
 
 
 class WinApp
 {
 public://静的メンバ関数
-	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparm, LPARAM lparam);
 public://メンバ変数
 	//初期化
 	void Initialize();
@@ -22,8 +24,8 @@ public://定数
 
 	HWND GetHwnd() const { return hwnd; }
 	HINSTANCE GetHInstance() const { return wc.hInstance; }
-private:
 
+private:
 	
 	HWND hwnd = nullptr;
 	WNDCLASS wc{};
