@@ -9,14 +9,15 @@
 #include <math.h>
 #include <numbers>
 #include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 #include <corecrt_math_defines.h>
 #include <fstream>
 #include <sstream>
 #include "Input.h"
+#include "WinApp.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
