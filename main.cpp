@@ -9,21 +9,20 @@
 #include <math.h>
 #include <numbers>
 #include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 #include <corecrt_math_defines.h>
 #include <fstream>
 #include <sstream>
 #include "Input.h"
-#include "WinApp.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxcompiler.lib")
 
-
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
 
@@ -983,17 +982,18 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 	return resource;
 }
 
+
 //Windowsアプリのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+	//CoInitializeEx(0, COINIT_MULTITHREADED);
+
+
+#pragma region Windouの生成
 	WinApp* winApp = nullptr;
 
 	winApp = new WinApp();
 	winApp->Initialize();
-
-
-	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
-//	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 	Input* input = nullptr;
 	input = new Input();
@@ -1156,13 +1156,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-	hr = dxgiFactory->CreateSwapChainForHwnd(
-		commandQueue,
-		winApp->GetHwnd(),
-		&swapChainDesc, 
-		nullptr, 
-		nullptr,
-		reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, winApp->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
 	assert(SUCCEEDED(hr));
 
 	//SwapchainからResourceを引っ張ってくる
@@ -1441,7 +1435,59 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma endregion
 
 
-	
+	//ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
+
+
+	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+
+	//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+
+	//vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+
+	//vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+
+	//ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+
+	//Matrix4x4* wvpDate = nullptr;
+
+	//wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate));
+
+	//*wvpDate = MakeIdentity4x4();
+
+	//VertexData* vertexData = nullptr;
+
+	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	////leftTop
+	//vertexData[0].position = { -0.5f, -0.5f,0.0f,1.0f };
+	//vertexData[0].texcoord = { 0.0f,1.0f };
+
+	////Top
+	//vertexData[1].position = { 0.0f, 0.5f,0.0f,1.0f };
+	//vertexData[1].texcoord = { 0.5f,0.0f };
+
+	////rightBottom
+	//vertexData[2].position = { 0.5f, -0.5f,0.0f,1.0f };
+	//vertexData[2].texcoord = { 1.0f,1.0f };
+
+
+
+	////leftTop
+	//vertexData[3].position = { -0.5f, -0.5f,0.5f,1.0f };
+	//vertexData[3].texcoord = { 0.0f,1.0f };
+
+	////Top
+	//vertexData[4].position = { 0.0f, 0.0f,0.0f,1.0f };
+	//vertexData[4].texcoord = { 0.5f,0.0f };
+
+	////rightBottom
+	//vertexData[5].position = { 0.5f, -0.5f,-0.5f,1.0f };
+	//vertexData[5].texcoord = { 1.0f,1.0f };
+
+
+
+
+
 
 	uint32_t SphereVertexNum = 16 * 16 * 6;
 
@@ -1674,27 +1720,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	uint64_t fenceValue = 0;
 	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
-	 
+
 	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
 
 
 
 
+
+
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
-	while (msg.message != WM_QUIT) {
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+	while (true) {
+
+		if (winApp->ProcessMessage()) {
+			break;
 		}
 		else {
-
-			//入力の更新
 			input->Update();
+
 			if (input->TriggerKey(DIK_SPACE)) {
 				OutputDebugStringA("Hit 0\n");
-
 			}
 
 			//ゲームの処理
@@ -1977,10 +2023,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 
+	winApp->Finalize();
+
 	//入力解放
 	delete input;
-
 	delete winApp;
+
+	winApp = nullptr;
 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
@@ -2052,7 +2101,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	winApp->Finalize();
+
 
 
 
@@ -2065,7 +2114,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		debug->Release();
 	}
 
-	CoUninitialize();
 
 
 	return 0;

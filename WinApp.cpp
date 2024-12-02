@@ -1,30 +1,38 @@
 #include "WinApp.h"
 
-#include "externals/imgui/imgui_impl_win32.h"
+#include "externals/imgui/imgui.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wPARAm, LPARAM lParam);
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lParam) {
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lParam)) {
+LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
 	}
 
+	//メッセージに応じてゲーム固有の処理を行う
 	switch (msg) {
-
+		//ウィンドウが破壊された
 	case WM_DESTROY:
-
+		//OSに対して、アプリの終了を伝える
 		PostQuitMessage(0);
 		return 0;
 	}
 
-	return DefWindowProc(hwnd, msg, wparam, lParam);
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+		return true;
+	}
+
+	//標準のメッセージ処理を行う
+	return DefWindowProc(hwnd, msg, wparam, lparam);
+
 }
 
 void WinApp::Initialize()
 {
-	HRESULT hr= CoInitializeEx(0, COINIT_MULTITHREADED);
+	HRESULT hr = CoInitializeEx(0, COINITBASE_MULTITHREADED);
 
-#pragma region Windowの生成
+
 
 	//ウィンドウプロシージャ
 	wc.lpfnWndProc = WindowProc;
@@ -43,9 +51,12 @@ void WinApp::Initialize()
 	RECT wrc = { 0, 0,kClientWidth,kClientHeight };
 
 
-	HWND hwnd = CreateWindow(
+	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
+	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
+
+	hwnd = CreateWindow(
 		wc.lpszClassName,
-		L"GE3",
+		L"CG2",
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -56,8 +67,10 @@ void WinApp::Initialize()
 		wc.hInstance,
 		nullptr);
 
-	ShowWindow(hwnd, SW_SHOW);
 
+
+
+	ShowWindow(hwnd, SW_SHOW);
 }
 
 void WinApp::Update()
@@ -68,4 +81,25 @@ void WinApp::Finalize()
 {
 	CloseWindow(hwnd);
 	CoUninitialize();
+}
+
+bool WinApp::ProcessMessage()
+{
+
+	MSG msg{};
+
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	if (msg.message == WM_QUIT)
+	{
+		return false;
+	}
+
+	return false;
+
+	return false;
 }
