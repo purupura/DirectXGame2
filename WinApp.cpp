@@ -98,5 +98,4 @@ bool WinApp::ProcessMessage()
 
 	return false;
 
-	return false;
 }
