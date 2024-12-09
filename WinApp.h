@@ -1,6 +1,8 @@
 #pragma once
+#include <Windows.h>
 #include <cstdint>
 #include <wrl.h>
+#include <WinUser.h>
 
 class WinApp
 {
@@ -10,7 +12,7 @@ public:
 	static const int32_t kClientWidth = 1280;
 	static const int32_t kClientHeight = 720;
 
-	HWND hwnd = nullptr;
+
 
 	HWND GetHwnd() const { return hwnd; }
 
@@ -25,6 +27,7 @@ public:
 	bool ProcessMessage();
 
 private:
+	HWND hwnd = nullptr;
 	WNDCLASS wc{};
 
 };
