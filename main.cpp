@@ -1750,8 +1750,8 @@ winApp->Finalize();
 delete input;
 delete winApp;
 delete dxCommon;
-//
-//	winApp = nullptr;
+//winApp = nullptr;
+
 //
 return 0;
 }

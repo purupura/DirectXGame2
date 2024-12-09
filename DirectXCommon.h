@@ -17,35 +17,20 @@ public:
 
     void Initialize(WinApp* winApp);
 
-    // デバイスの生成
+
     void CreateDevice();
-    // コマンド関連の初期化
     void CommandInitialize();
-    // スワップチェーンの生成
     void CreateSwapChain();
-    // 深度バッファの生成
     void CreateDepthBuffer();
-    // 各種デスクリプタヒープの生成
     void CreateDescriptorHeaps();
-    // レンダーターゲットビューの初期化
     void RenderTargetViewInitialize();
-    // 深度ステンシルビューの初期化
     void InitializeDepthStencilView();
-    // フェンスの初期化
     void InitializeFence();
-    // ビューポート矩形の初期化
     void InitializeViewportAndScissorRect();
-    // シザリング矩形の初期化
     void InitializeScissorRect();
-    // DXCコンパイラの生成
     void CreateDXCCompiler();
-    // ImGuiの初期化
     void InitializeImGui();
 
-
-    //// デバイスの生成
-    //Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
-    //Microsoft::WRL::ComPtr<IDXGIAdapter4> useadapter = nullptr;
     //dxgiFactoryの生成
     Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
