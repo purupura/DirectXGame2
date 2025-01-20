@@ -420,7 +420,13 @@ void DirectXCommon::PreDraw()
 		float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
 		//コマンド蓄積
 		commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		//描画用のDescriptorHeap
+		ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get()};
+		commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
+		commandList->RSSetViewports(1, &viewport);
+		commandList->RSSetScissorRects(1, &scissorRect);
 }
 
 void DirectXCommon::PostDraw()
@@ -430,41 +436,40 @@ void DirectXCommon::PostDraw()
 
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = swapChainResources[bbIndex].Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	//TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
 
 	//コマンドリストの内容を確定させる。全てのコマンドを積んでからclearする
-			HRESULT hr = commandList->Close();
-			assert(SUCCEEDED(hr));
+	HRESULT hr = commandList->Close();
+	assert(SUCCEEDED(hr));
 
 	//GPUにコマンドリストの実行を行わせる
-			ID3D12CommandList* commandLists[] = { commandList.Get()};
-		commandQueue->ExecuteCommandLists(1, commandLists);
-		//GPUとOSに画面の交換を行うように通知する
-		swapChain->Present(1, 0);
+	ID3D12CommandList* commandLists[] = { commandList.Get()};
+	commandQueue->ExecuteCommandLists(1, commandLists);
+	//GPUとOSに画面の交換を行うように通知する
+	swapChain->Present(1, 0);
 
-			//// 出力ウィンドウへの文字出力
-			//OutputDebugStringA("Hello DirectX!\n");
-			//FENCEを更新する
-		fenceVal++;
-			commandQueue->Signal(fence.Get(), fenceVal);
+	//FENCEを更新する
+	fenceVal++;
+	commandQueue->Signal(fence.Get(), fenceVal);
 
-			if (fence->GetCompletedValue() < fenceVal) {
+	if (fence->GetCompletedValue() < fenceVal) {
 
-				fence->SetEventOnCompletion(fenceVal, fenceEvent);
+		fence->SetEventOnCompletion(fenceVal, fenceEvent);
 
-				WaitForSingleObject(fenceEvent, INFINITE);
+		WaitForSingleObject(fenceEvent, INFINITE);
 
-			}
+	}
 
 
-			//次のフレームのコマンドリストを準備
-			hr = commandAllocator->Reset();
-			assert(SUCCEEDED(hr));
-			hr = commandList->Reset(commandAllocator.Get(), nullptr);
-			assert(SUCCEEDED(hr));
+	//次のフレームのコマンドリストを準備
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList->Reset(commandAllocator.Get(), nullptr);
+	assert(SUCCEEDED(hr));
 
 }
 

@@ -1513,9 +1513,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 //
 
 
-//			//描画用のDescriptorHeap
-//			ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
-//			commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
 //
 //			//DSV
 //			D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -1523,8 +1521,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 //
 //
 //
-//			commandList->RSSetViewports(1, &viewport);
-//			commandList->RSSetScissorRects(1, &scissorRect);
+
 //
 //			commandList->SetGraphicsRootSignature(rootSignature);
 //			commandList->SetPipelineState(graphicsPipelineState);
@@ -1573,7 +1570,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 //			commandList->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
 //
 //
-//			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+//			
 //			commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 //
 //
@@ -1599,7 +1596,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 //
 
 //
-
+		dxCommon->PostDraw();
 		}
 	}
 //

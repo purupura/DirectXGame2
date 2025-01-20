@@ -36,6 +36,8 @@ public:
     /// <summary>
 /// 指定番号のCPUデスクリプタハンドルを取得する
 /// </summary>
+  
+    
     static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
     /// <summary>
@@ -92,10 +94,12 @@ private:
     IDxcIncludeHandler* includeHandler = nullptr;
     //RTVを二つ作るのでディスクリプタを二つ用意
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 
     Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
     UINT64 fenceVal = 0;
     HANDLE fenceEvent = nullptr;
     WinApp* winApp_ = nullptr;
-
+    D3D12_VIEWPORT viewport{};
+    D3D12_RECT scissorRect{};
 };
