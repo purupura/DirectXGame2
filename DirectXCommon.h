@@ -30,6 +30,28 @@ public:
     void InitializeScissorRect();
     void CreateDXCCompiler();
     void InitializeImGui();
+    void PreDraw();
+    void PostDraw();
+
+    /// <summary>
+/// 指定番号のCPUデスクリプタハンドルを取得する
+/// </summary>
+    static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
+
+    /// <summary>
+    /// 指定番号のGPLUデスクリプタハンドルを取得する
+    /// </summary>
+    static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
+        uint32_t descriptorSize, uint32_t index);
+    ///<summary>
+    ///SRVの指定番号のCPUデスクリプタハンドルを取得する    
+    /// </summary>
+    D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
+    /// <summary>
+    /// SRVの指定番号のGPUデスクリプタハンドルを取得する
+    /// </summary>
+    D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+private:
 
     //dxgiFactoryの生成
     Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
@@ -59,25 +81,6 @@ public:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device,
         D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
-    /// <summary>
-    /// 指定番号のCPUデスクリプタハンドルを取得する
-    /// </summary>
-    static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
-
-    /// <summary>
-    /// 指定番号のGPLUデスクリプタハンドルを取得する
-    /// </summary>
-    static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
-        uint32_t descriptorSize, uint32_t index);
-    ///<summary>
-    ///SRVの指定番号のCPUデスクリプタハンドルを取得する    
-    /// </summary>
-    D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
-    /// <summary>
-    /// SRVの指定番号のGPUデスクリプタハンドルを取得する
-    /// </summary>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
-
     uint32_t descriptorSizeSRV = 0;
     uint32_t descriptorSizeRTV = 0;
     uint32_t descriptorSizeDSV = 0;
@@ -87,9 +90,12 @@ public:
     IDxcCompiler3* dxcCompiler = nullptr;
     //include対応のため設定しておく
     IDxcIncludeHandler* includeHandler = nullptr;
+    //RTVを二つ作るのでディスクリプタを二つ用意
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 
-private:
-
+    Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
+    UINT64 fenceVal = 0;
+    HANDLE fenceEvent = nullptr;
     WinApp* winApp_ = nullptr;
 
 };
