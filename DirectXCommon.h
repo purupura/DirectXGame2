@@ -8,11 +8,15 @@
 #include "Logger.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include <dxcapi.h>
+#include <chrono>
+#include <thread>
 
 class DirectXCommon
 {
+
 public:
 
+    ~DirectXCommon();
 
     void Initialize(WinApp* winApp);
 
@@ -44,6 +48,11 @@ public:
     void PreDraw();
     //描画後処理
     void PostDraw();
+
+    // FPS固定初期化
+    void InitializeFixFPS();
+    // FPS固定更新
+    void UpdateFixFPS();
 
     //Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device,
@@ -111,6 +120,9 @@ public:
 
 private:
 
+    //記録時間(FPS固定用)
+    std::chrono::steady_clock::time_point reference_;
+
     //// デバイスの生成
     //Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
     //Microsoft::WRL::ComPtr<IDXGIAdapter4> useadapter = nullptr;
@@ -150,10 +162,10 @@ private:
     uint32_t descriptorSizeDSV = 0;
 
     //DXCの初期化
-    IDxcUtils* dxcUtils = nullptr;
-    IDxcCompiler3* dxcCompiler = nullptr;
+    Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
+    Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
     //include対応のため設定しておく
-    IDxcIncludeHandler* includeHandler = nullptr;
+    Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 
     //フェンスの生成
     Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
@@ -166,4 +178,3 @@ private:
     WinApp* winApp_ = nullptr;
 
 };
-

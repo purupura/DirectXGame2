@@ -28,4 +28,3 @@ private:
 	HWND hwnd = nullptr;
 	WNDCLASS wc{};
 };
-

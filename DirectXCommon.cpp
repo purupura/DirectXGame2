@@ -14,12 +14,27 @@
 
 using namespace Microsoft::WRL;
 
+DirectXCommon::~DirectXCommon() {
+	// ImGuiの終了処理
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+
+	// フェンスイベントの解放
+	if (fenceEvent) {
+		CloseHandle(fenceEvent);
+		fenceEvent = nullptr;
+	}
+}
+
 
 void DirectXCommon::Initialize(WinApp* winApp) {
 	// NULL検出
 	assert(winApp);
 	// メンバ変数に記録
 	this->winApp_ = winApp;
+	//FPS固定初期化
+	InitializeFixFPS();
 
 	// デバイスの生成
 	CreateDevice();
@@ -44,7 +59,7 @@ void DirectXCommon::Initialize(WinApp* winApp) {
 	// DXCコンパイラの生成
 	CreateDXCCompiler();
 	// ImGuiの初期化
-	//InitializeImGui();
+	InitializeImGui();
 }
 
 void DirectXCommon::CreateDevice()
@@ -60,7 +75,9 @@ void DirectXCommon::CreateDevice()
 
 	}
 
-#endif
+#endif // DEBUG
+
+
 
 #pragma region DXGIFactryの生成
 
@@ -281,7 +298,6 @@ void DirectXCommon::InitializeFence()
 
 void DirectXCommon::InitializeViewportAndScissorRect()
 {
-
 	viewport.Width = winApp_->kClientWidth;
 	viewport.Height = winApp_->kClientHeight;
 	viewport.TopLeftX = 0;
@@ -289,30 +305,32 @@ void DirectXCommon::InitializeViewportAndScissorRect()
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 
-}
-
-void DirectXCommon::InitializeScissorRect()
-{
-
+	// シザーレクトの設定
 	scissorRect.left = 0;
 	scissorRect.right = winApp_->kClientWidth;
 	scissorRect.top = 0;
 	scissorRect.bottom = winApp_->kClientHeight;
 }
 
+void DirectXCommon::InitializeScissorRect()
+{
+	// ビューポートとシザーレクトを設定
+	GetCommandList()->RSSetViewports(1, &viewport);
+	GetCommandList()->RSSetScissorRects(1, &scissorRect);
+}
+
 void DirectXCommon::CreateDXCCompiler()
 {
-	HREFTYPE hr;
-
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+	// DXCを初期化
+	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
 	assert(SUCCEEDED(hr));
 
 	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
 	assert(SUCCEEDED(hr));
 
+	//現時点でincludeはしないが、includeに対応するための設定を行っておく
 	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr));
-
 }
 
 void DirectXCommon::InitializeImGui()
@@ -392,6 +410,8 @@ void DirectXCommon::PostDraw()
 	HRESULT hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
+	//FPS固定の処理
+	UpdateFixFPS();
 
 	// GPUにコマンドリストの実行を行わせる
 
@@ -419,6 +439,42 @@ void DirectXCommon::PostDraw()
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator.Get(), nullptr);
 	assert(SUCCEEDED(hr));
+}
+
+void DirectXCommon::InitializeFixFPS()
+{
+	// 現在時間を記録する
+	reference_ = std::chrono::steady_clock::now();
+
+
+}
+
+void DirectXCommon::UpdateFixFPS()
+{
+
+	// 1/60秒ぴったりの時間
+	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
+	// 1/60秒よりわずかに短い時間
+	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
+
+	// 現在時間を取得する
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+	// 前回記録からの経過時間を取得する
+	std::chrono::microseconds elapsed =
+		std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+	// 1/60秒 (よりわずかに短い時間) 経っていない場合
+	if (elapsed < kMinTime) {
+
+		// 1/66秒経過するまで微小なスリープを繰り返す
+		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
+			// 1マイクロ秒スリープ
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+
+		}
+	}
+	// 現在の時間を記録する
+	reference_ = std::chrono::steady_clock::now();
 }
 
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
@@ -489,7 +545,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::compileShader(const std::wstring
 	};
 
 	IDxcResult* shaderResult = nullptr;
-	hr = dxcCompiler->Compile(&shaderSourceBeffer, arguments, _countof(arguments), includeHandler, IID_PPV_ARGS(&shaderResult));
+	hr = dxcCompiler->Compile(&shaderSourceBeffer, arguments, _countof(arguments), includeHandler.Get(), IID_PPV_ARGS(&shaderResult));
 
 	assert(SUCCEEDED(hr));
 
@@ -545,7 +601,6 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
 {
-
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width);
 	resourceDesc.Height = UINT(metadata.height);

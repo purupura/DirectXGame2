@@ -4,17 +4,17 @@
 #pragma comment(lib, "dxgi.lib")
 
 #include "DirectXCommon.h"
-#include "D3DResourceLeakChecker.h"
 #include "Input.h"
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Vector4.h"
 #include "Matrix4x4.h"
 #include <fstream>
 #include <sstream>
 #include <cassert>
 #include <vector>
 #include <string>
+#include "D3DResourceLeakChecker.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
 #include "affine.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -203,7 +203,8 @@ ModelData LoaObjFile(const std::string& directoryPath, const std::string& filena
 }
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	//D3DResourceLeakChecker LeakCheak;
+
+	D3DResourceLeakChecker LeakCheak;
 
 	WinApp* winApp_ = nullptr;
 	winApp_ = new WinApp();
@@ -393,15 +394,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//Resourcef
 	const uint32_t kSubdivision = 36;
 
-	////VertexResourceを生成
-	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceComPtr = dxCommon->CreateBufferResource(sizeof(VertexData) * kSubdivision * kSubdivision * 6);
-	//ID3D12Resource* vertexResource = vertexResourceComPtr.Get();
 
-	//モデル読み込み
 	ModelData modelData = LoaObjFile("resources", "plane.obj");
 
-	//ModelData modelData = LoaObjFile("resources", "plane.obj");
-	//ModelData modelData = LoaObjFile("resources", "plane.obj");
 
 	//頂点リソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexReComPtr = dxCommon->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
@@ -504,22 +499,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexDataSprite[3].texcoord = { 1.0f, 0.0f };
 	vertexDataSprite[3].nomal = { 0.0f, 0.0f, -1.0f };
 
-	D3D12_VIEWPORT viewport{};
-
-	viewport.Width = winApp_->kClientWidth;
-	viewport.Height = winApp_->kClientHeight;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
-	D3D12_RECT scissorRect{};
-
-	scissorRect.left = 0;
-	scissorRect.right = winApp_->kClientWidth;
-	scissorRect.top = 0;
-	scissorRect.bottom = winApp_->kClientHeight;
-
 	TransformVector3 transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	TransformVector3 cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -568,9 +547,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	MSG msg{};
 
-
-	dxCommon->InitializeImGui();
-
 	while (true)
 	{
 		if (winApp_->ProsessMeassage())
@@ -587,7 +563,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// 描画前処理
 			dxCommon->PreDraw();
 
-			transform.rotate.y += 0.0f;
+			transform.rotate.y -= 0.05f;
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -617,20 +593,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::NewFrame();
 
 			// ImGuiウィンドウ
-			ImGui::Begin("Ball Controls");
+			ImGui::Begin("Controls");
 			ImGui::SliderFloat3("Position", &transform.translate.x, -5.0f, 5.0f);
 			ImGui::SliderFloat3("Rotation", &transform.rotate.x, -180.0f, 180.0f);
 			ImGui::SliderFloat3("Scale", &transform.scale.x, 0.1f, 2.0f);
+
+			ImGui::Checkbox("useMonsterball", &useMonsterBall);
 			ImGui::End();
 
 			// ImGuiの描画
 			ImGui::Render();
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
 
+			dxCommon->InitializeViewportAndScissorRect();
+			dxCommon->InitializeScissorRect();
 
-
-			dxCommon->GetCommandList()->RSSetViewports(1, &viewport);
-			dxCommon->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 			//RootSignatureを設定。PSOに設定しているけど別途設定が必要
 			dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 			dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
@@ -659,9 +636,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// 描画！（DrawCall/ドローコール）6個のインデックスを使用し1つのインスタンスを描画。その他は当面0で良い
 			//commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);//06_00
 
-			// 描画処理
-			// ここにあなたの描画コードを追加します
-
 			// 描画後処理
 			dxCommon->PostDraw();
 		}
@@ -674,11 +648,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete input;
 	delete winApp_;
 	delete dxCommon;
-	//winApp_ = nullptr;
 
-
-	//CloseHandle(fenceEvent);
-
-	//CoUninitialize();
 	return 0;
 }
