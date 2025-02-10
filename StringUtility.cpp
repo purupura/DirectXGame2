@@ -1,9 +1,8 @@
 #include <windows.h>
 #include <stringapiset.h>
 #include <string>
-#include "StringUtility.h"
 
-namespace StringUtility
+namespace StringUitilty
 {
     std::wstring ConvertString(const std::string& str)
     {
@@ -21,4 +20,3 @@ namespace StringUtility
         return strTo;
     }
 };
-

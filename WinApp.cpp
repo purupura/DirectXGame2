@@ -1,101 +1,82 @@
 #include "WinApp.h"
 
-#include "externals/imgui/imgui.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wPARAm, LPARAM lParam);
 
+#include "externals/imgui/imgui_impl_win32.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-		return true;
-	}
+LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lParam) {
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lParam)) {
+        return true;
+    }
 
-	//メッセージに応じてゲーム固有の処理を行う
-	switch (msg) {
-		//ウィンドウが破壊された
-	case WM_DESTROY:
-		//OSに対して、アプリの終了を伝える
-		PostQuitMessage(0);
-		return 0;
-	}
+    switch (msg) {
 
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-		return true;
-	}
+    case WM_DESTROY:
 
-	//標準のメッセージ処理を行う
-	return DefWindowProc(hwnd, msg, wparam, lparam);
+        PostQuitMessage(0);
+        return 0;
+    }
 
+    return DefWindowProc(hwnd, msg, wparam, lParam);
 }
+
 
 void WinApp::Initialize()
 {
-	HRESULT hr = CoInitializeEx(0, COINITBASE_MULTITHREADED);
+    HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+
+    //WNDCLASS wc{};
+    wc.lpfnWndProc = WindowProc;
+    wc.lpszClassName = L"CG2WindowClass";
+    wc.hInstance = GetModuleHandle(nullptr);
+    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+
+    (!RegisterClass(&wc));
+
+    //const int32_t kClientWidth = 1280;
+    //const int32_t kClientHeight = 720;
+
+    RECT wrc = { 0, 0, kClientWidth, kClientHeight };
+    AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, FALSE);
 
 
+    hwnd = CreateWindow(
+        wc.lpszClassName,
+        L"CG2",
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        wrc.right - wrc.left, wrc.bottom - wrc.top,
+        nullptr, nullptr, wc.hInstance, nullptr);
 
-	//ウィンドウプロシージャ
-	wc.lpfnWndProc = WindowProc;
-	//ウィンドウクラス名
-	wc.lpszClassName = L"C62WindowClass";
-	//インスタンスハンドル
-	wc.hInstance = GetModuleHandle(nullptr);
-	//カーソル
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-	//ウィンドウクラスの登録
-	RegisterClass(&wc);
-
-
-	//　ウィンドウサイズを表す構造体にクライアント領域を入れる
-	RECT wrc = { 0, 0,kClientWidth,kClientHeight };
-
-
-	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-	hwnd = CreateWindow(
-		wc.lpszClassName,
-		L"GE3",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		wrc.right - wrc.left,
-		wrc.bottom - wrc.top,
-		nullptr,
-		nullptr,
-		wc.hInstance,
-		nullptr);
-
-	ShowWindow(hwnd, SW_SHOW);
+    ShowWindow(hwnd, SW_SHOW);
 }
 
 void WinApp::Update()
 {
+    // Your update logic here
 }
 
 void WinApp::Finalize()
 {
-	CloseWindow(hwnd);
-	CoUninitialize();
+    CloseWindow(hwnd);
+    CoUninitialize();
 }
 
-bool WinApp::ProcessMessage()
+bool WinApp::ProsessMeassage()
 {
+    MSG msg{};
 
-	MSG msg{};
+    if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
-	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+    if (msg.message == WM_QUIT)
+    {
+        return true;
+    }
 
-	if (msg.message == WM_QUIT)
-	{
-		return false;
-	}
-
-	return false;
-
+    return false;
 }

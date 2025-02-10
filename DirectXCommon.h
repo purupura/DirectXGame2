@@ -19,15 +19,15 @@ public:
     // デバイスの生成
     void CreateDevice();
     // コマンド関連の初期化
-    void CommandInitialize();
+    void InitializeCommandObjects();
     // スワップチェーンの生成
     void CreateSwapChain();
     // 深度バッファの生成
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthBuffer();
     // 各種デスクリプタヒープの生成
-    void  CreateDescriptorHeaps();
+    void CreateDescriptorHeaps();
     // レンダーターゲットビューの初期化
-    void RenderTargetViewInitialize();
+    void InitializeRenderTargetView();
     // 深度ステンシルビューの初期化
     void InitializeDepthStencilView();
     // フェンスの初期化
@@ -67,6 +67,47 @@ public:
     /// SRVの指定番号のGPUデスクリプタハンドルを取得する
     /// </summary>
     D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+
+
+    //Getter
+    ID3D12Device* GetDevice() const { return device.Get(); }
+    ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDSVDescriptorHeap() const { return dsvDescriptorHeap; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetRTVDescriptorHeap() const { return rtvDescriptorHeap; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVDescriptorHeap() const { return srvDescriptorHeap; }
+    uint32_t GetDescriptorSizeRTV() const { return descriptorSizeRTV; }
+    uint32_t GetDescriptorSizeSRV() const { return descriptorSizeSRV; }
+
+    Microsoft::WRL::ComPtr<IDxcBlob> compileShader(const std::wstring& filePath, const wchar_t* profile);
+
+    /// <summary>
+    /// バッファリソースの生成
+    /// </summary>
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+
+    /// <summary>
+    /// テクスチャリソースの生成
+    /// </summary>
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(
+        ID3D12Device* device, const DirectX::TexMetadata& metadata);
+    /// <summary>
+    /// テクスチャデータの転送
+    /// </summary>
+
+    [[nodiscard]]
+    Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
+
+    /// <summary>
+    /// テクスチャファイルの読み込み
+    /// </summary>
+    /// <param name="filePath">テクスチャファイルのパス</param>
+    /// <returns>画像イメージデータ</returns>
+    static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
+    /// <summary>
+    /// 深度ステンシルテクスチャリソースの生成
+    /// 
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
 
 private:
 
@@ -116,7 +157,7 @@ private:
 
     //フェンスの生成
     Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
-    UINT64 fenceVal = 0;
+    UINT64 fenceValue = 0;
     HANDLE fenceEvent = nullptr;
 
     D3D12_VIEWPORT viewport{};
@@ -125,3 +166,4 @@ private:
     WinApp* winApp_ = nullptr;
 
 };
+

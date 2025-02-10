@@ -1,8 +1,6 @@
 #pragma once
-
-struct Vector4 final {
+struct Vector3 final {
 	float x;
 	float y;
 	float z;
-	float w;
 };

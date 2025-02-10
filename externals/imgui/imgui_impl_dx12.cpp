@@ -159,6 +159,11 @@ static inline void SafeRelease(T*& res)
 // Render function
 void ImGui_ImplDX12_RenderDrawData(ImDrawData* draw_data, ID3D12GraphicsCommandList* ctx)
 {
+       if (!draw_data)
+    {
+        // エラーを処理、ログに記録、または早期にリターン
+        return;
+    }
     // Avoid rendering when minimized
     if (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f)
         return;
