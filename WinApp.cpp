@@ -63,6 +63,7 @@ void WinApp::Finalize()
     CoUninitialize();
 }
 
+
 bool WinApp::ProsessMeassage()
 {
     MSG msg{};
