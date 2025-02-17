@@ -221,8 +221,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp_);
 
-	//ウインドウを表示する
-	ShowWindow(winApp_->GetHwnd(), SW_SHOW);
+	
 
 #pragma endregion
 

@@ -5,6 +5,7 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lParam) {
+
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lParam)) {
         return true;
     }
@@ -42,7 +43,7 @@ void WinApp::Initialize()
 
     hwnd = CreateWindow(
         wc.lpszClassName,
-        L"CG2",
+        L"GE3",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
