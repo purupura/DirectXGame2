@@ -113,7 +113,7 @@ MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const st
 	return materialData;
 }
 
-ModelData LoaObjFile(const std::string& directoryPath, const std::string& filename) {
+ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename) {
 
 	// 1. 中で必要となる変数の宣言
 	ModelData modelData; // 構築するModalData
@@ -395,7 +395,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	const uint32_t kSubdivision = 36;
 
 
-	ModelData modelData = LoaObjFile("resources", "plane.obj");
+	ModelData modelData = LoadObjFile("resources", "plane.obj");
 
 
 	//頂点リソースを作る
